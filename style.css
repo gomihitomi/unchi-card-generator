@@ -1,0 +1,187 @@
+[v-cloak] {
+  display: none;
+}
+
+:root {
+  --border-edge: 60px;
+}
+
+.wrapper {
+  display: flex;
+  gap: 1em;
+  flex-wrap: wrap;
+}
+
+.u-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.u-no-stroke {
+  position: absolute;
+  -webkit-text-stroke: 0;
+}
+
+.u-flex-one {
+  flex: 1;
+}
+
+.card-container {
+  position: relative;
+  background: #000;
+  width: 630px;
+  height: 880px;
+  font-family: "IBM Plex Sans JP", "Noto Color Emoji", sans-serif;
+  white-space: pre-wrap;
+  line-height: 1.2;
+  font-weight: 500;
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.card-inner {
+  position: relative;
+  background: #fff;
+  width: calc(630px - var(--border-edge));
+  height: calc(880px - var(--border-edge));
+  overflow: hidden;
+}
+
+.card-inner-top {
+  font-weight: 700;
+  display: flex;
+  border-bottom: 2px solid #000;
+  height: 74px;
+}
+
+.card-inner-cost {
+  font-weight: 700;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  -webkit-text-stroke: 4px #000;
+  font-size: 51px;
+  font-family: "Roboto Condensed", sans-serif;
+  width: 100px;
+}
+
+.card-inner-cost > div:first-of-type {
+  text-align: right;
+}
+
+.power {
+  background: #000;
+  height: 74px;
+}
+
+.card-inner-name-row {
+  display: flex;
+  flex-direction: column;
+}
+
+.card-inner-top-name {
+  font-size: 30px;
+  border-left: 2px solid #000;
+  border-bottom: 2px solid #000;
+  text-align: center;
+  padding-top: 0.4em;
+}
+
+.card-inner-top-division {
+  font-size: 15px;
+  color: #fff;
+  -webkit-text-stroke: 3px #000;
+  padding: 0.3em 0 0 0;
+  height: 18px;
+}
+
+.card-inner-image {
+  position: relative;
+  width: 100%;
+  height: 480px;
+}
+
+.card-inner-image > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 100% 20%;
+}
+
+.card-inner-illus {
+  position: absolute;
+  bottom: 2px;
+  right: 4px;
+  font-size: 12px;
+  color: #fff;
+  -webkit-text-stroke: 4px #000;
+}
+
+.card-inner-meme {
+  font-size: 27px;
+  background-color: #000;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  font-family: "Roboto Condensed", sans-serif;
+}
+
+.card-inner-effect {
+  font-size: 21px;
+  padding: 0.4em;
+}
+
+.card-inner-bottom {
+  display: flex;
+  position: absolute;
+  bottom: 0;
+}
+
+.card-inner-flavor {
+  width: 100%;
+  font-size: 16px;
+  font-style: italic;
+  font-weight: 400;
+  width: 75%;
+  padding: 0 0.4em 0.2em 0.4em;
+}
+
+.control-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4em;
+  max-width: 630px;
+  flex: 1;
+}
+
+.control-row {
+  display: flex;
+}
+
+.control-row > label {
+  width: 150px;
+}
+
+.control-row > input,
+.control-row > textarea {
+  flex: 1;
+}
+
+.card-inside {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.card-inside-border {
+  width: calc(630px - var(--border-edge));
+  height: calc(880px - var(--border-edge));
+}
+
+.card-inside > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}

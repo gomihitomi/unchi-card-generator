@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="todo" />
+  <title>unchi</title>
+  <link rel="icon" href="./favicon.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+JP:wght@400;500;700&family=Roboto+Condensed:wght@700&display=swap"
+    rel="stylesheet" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/dom-to-image@2.6.0/dist/dom-to-image.min.js"></script>
+  <link href="./style.css" rel="stylesheet">
+</head>
+
+<body>
+  <div id="app" v-cloak>
+    <div class="wrapper" v-if="cardSet !== null">
+      <div id="card" class="card-container u-center" v-show="!isInside">
+        <div class="card-inner">
+          <div class="card-inner-top">
+            <div class="card-inner-cost u-center" :style="{ 'background-color': mainColor }">
+              <div class="u-flex-one">
+                <span class="u-no-stroke">{{playCost}}</span>
+                <span>{{playCost}}</span>
+              </div>
+              <div>
+                <span class="u-no-stroke">:</span>
+                <span>:</span>
+              </div>
+              <div class="u-flex-one">
+                <span class="u-no-stroke">{{resolveCost}}</span>
+                <span>{{resolveCost}}</span>
+              </div>
+            </div>
+            <div class="card-inner-name-row u-flex-one">
+              <div class="card-inner-top-name u-flex-one">
+                {{name}}
+              </div>
+              <div class="card-inner-top-division u-center" :style="{ 'background-color': mainColor }">
+                <span class=" u-no-stroke">{{division}}</span>
+                <span>{{division}}</span>
+              </div>
+            </div>
+          </div>
+          <div class="card-inner-image">
+            <img title="card image" :src="imageUrl" v-show="imageUrl" />
+            <div class="card-inner-illus">
+              <span class="u-no-stroke">{{illus}}</span>
+              <span>{{illus}}</span>
+            </div>
+          </div>
+          <div class="card-inner-meme">
+            {{meme}}
+            <span>{{formatedId}}</span>
+          </div>
+          <div class="card-inner-effect">
+            {{effect}}
+          </div>
+          <div class="card-inner-bottom">
+            <div class="card-inner-cost power u-center">
+              <div class="u-flex-one">
+                <span class="u-no-stroke">{{power}}</span>
+                <span>{{power}}</span>
+              </div>
+              <div>
+                <span class="u-no-stroke">/</span>
+                <span>/</span>
+              </div>
+              <div class="u-flex-one">
+                <span class="u-no-stroke">{{toughness}}</span>
+                <span>{{toughness}}</span>
+              </div>
+            </div>
+            <div class="card-inner-flavor u-flex-one">
+              {{flavor}}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="cardInside" class="card-container u-center" v-show="isInside">
+        <div class="card-inside" :class="{ 'card-inside-border': isInsideBorder }">
+          <img title="card image" :src="imageUrl" v-show="imageUrl" />
+        </div>
+      </div>
+      <div class="control-container">
+        <button type="button" @click="output">画像出力</button>
+        <div class="control-row">
+          <label for="id">ID</label>
+          <input id="id" v-model="id" type="number" min="0" @keydown.enter="output" />
+        </div>
+        <div class="control-row">
+          <label for="name">名前</label>
+          <input id="name" v-model="name" type="text" />
+        </div>
+        <div class="control-row">
+          <label for="division">ディビジョン</label>
+          <input id="division" v-model="division" type="text" />
+        </div>
+        <div class="control-row">
+          <label for="mainColor">ディビジョン色</label>
+          <input id="mainColor" v-model="mainColor" type="text" />
+        </div>
+        <div class="control-row">
+          <label for="playCost">プレイコスト</label>
+          <input id="playCost" v-model="playCost" type="text" />
+        </div>
+        <div class="control-row">
+          <label for="resolveCost">リゾルブコスト</label>
+          <input id="resolveCost" v-model="resolveCost" type="text" />
+        </div>
+        <div class="control-row">
+          <label for="power">攻撃力</label>
+          <input id="power" v-model="power" type="text" />
+        </div>
+        <div class="control-row">
+          <label for="toughness">体力</label>
+          <input id="toughness" v-model="toughness" type="text" />
+        </div>
+        <div class="control-row">
+          <label for="meme">ミーム</label>
+          <input id="meme" v-model="meme" type="text" />
+        </div>
+        <div class="control-row">
+          <label for="effect">効果</label>
+          <textarea id="effect" v-model="effect" rows="4"></textarea>
+        </div>
+        <div class="control-row">
+          <label for="flavor">フレーバー</label>
+          <textarea id="flavor" v-model="flavor" rows="4"></textarea>
+        </div>
+        <div class="control-row">
+          <label for="illustrator">イラストレーター</label>
+          <input id="illustrator" v-model="illustrator" type="text" />
+        </div>
+        <div class="control-row">
+          <label>カード画像</label>
+          <button type="button" @click="removeImage" :disabled="!uploadedImage">削除</button>
+          <input type="file" @change="onUploadImage" placeholder="upload image." />
+        </div>
+        <div class="control-row">
+          <label>裏面</label>
+          <label for="isInside">裏面モード</label>
+          <input id="isInside" type="checkbox" v-model="isInside">
+          <label for="isInsideBorder">縁あり</label>
+          <input id="isInsideBorder" type="checkbox" v-model="isInsideBorder">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/vue@next"></script>
+  <script>
+    const MAIN_COLOR_MAP = {
+      "クリムゾンスレイヤー": "#CC0033",
+      "アジュールブレイン": "#508BC3",
+      "フォレストソウル": "#288C66"
+    }
+
+    const isHalfFontSize = (value) => String(value).length > 1;
+
+    const App = {
+      data() {
+        return {
+          cardSet: null,
+          id: 1,
+          name: "",
+          division: "",
+          playCost: 0,
+          resolveCost: 0,
+          power: 0,
+          toughness: 0,
+          effect: "",
+          meme: "",
+          flavor: "",
+          illustrator: "Bing Image Creator",
+          mainColor: "#000000",
+          uploadedImage: null,
+          isInside: false,
+          isInsideBorder: true,
+        };
+      },
+      computed: {
+        illus() {
+          return this.illustrator ? `illus. ${this.illustrator}` : "";
+        },
+        formatedId() {
+          return String(this.id).padStart(4, "0")
+        },
+        imageUrl() {
+          if (!!this.uploadedImage) {
+            return this.uploadedImage;
+          }
+          if (this.isExistsId(this.id)) {
+            return `img/${this.formatedId}.jpg`
+          }
+          return null;
+        },
+      },
+      mounted() {
+        this.cardSet = fetch('./data.json')
+          .then((res) => res.json())
+          .then((json) => {
+            this.cardSet = json.cardSet;
+            this.setCardDataById(1);
+          });
+      },
+      watch: {
+        id(value) {
+          if (this.isExistsId(value)) {
+            this.setCardDataById(value);
+          }
+        }
+      },
+      methods: {
+        setCardDataById() {
+          const target = (this.id < 1 ?? this.id > 75) ? 1 : this.id - 1;
+          const rawData = this.cardSet[target];
+          this.name = rawData[1];
+          this.division = rawData[2];
+          this.playCost = rawData[3];
+          this.resolveCost = rawData[4];
+          this.power = rawData[5];
+          this.toughness = rawData[6];
+          this.effect = rawData[7];
+          this.meme = rawData[8];
+          this.flavor = rawData[9];
+
+          this.setMainColor(this.division);
+        },
+        isExistsId(value) {
+          return value >= 1 && value <= this.cardSet.length;
+        },
+        setMainColor(division) {
+          const color = MAIN_COLOR_MAP[division];
+          if (!!color) this.mainColor = color;
+        },
+        onUploadImage(e) {
+          const files = e.target.files || e.dataTransfer.files;
+          this.createImage(files[0]);
+        },
+        createImage(file) {
+          const reader = new FileReader();
+          reader.onload = e => {
+            this.uploadedImage = e.target.result;
+          };
+          reader.readAsDataURL(file);
+        },
+        removeImage() {
+          this.uploadedImage = null;
+        },
+        output() {
+          const node = document.getElementById('card');
+          domtoimage.toPng(node, { width: 630, height: 880 })
+            .then((dataUrl) => {
+              var link = document.createElement('a');
+              link.download = `${this.formatedId}.png`;
+              link.href = dataUrl;
+              link.click();
+            })
+            .catch(function (error) {
+              console.error('oops, something went wrong!', error);
+            });
+        },
+      },
+    };
+
+    Vue.createApp(App).mount("#app");
+  </script>
+</body>
+
+</html>
