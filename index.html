@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="todo" />
+  <meta name="description" content="unchiのカードを作る奴" />
   <title>unchi</title>
   <link rel="icon" href="./favicon.ico" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,7 +19,7 @@
 <body>
   <div id="app" v-cloak>
     <div class="wrapper" v-if="cardSet !== null">
-      <div id="card" class="card-container u-center" v-show="!isInside">
+      <div id="card" class="card-container u-center" v-show="!isBack">
         <div class="card-inner">
           <div class="card-inner-top">
             <div class="card-inner-cost u-center" :style="{ 'background-color': mainColor }">
@@ -81,13 +81,16 @@
           </div>
         </div>
       </div>
-      <div id="cardInside" class="card-container u-center" v-show="isInside">
-        <div class="card-inside" :class="{ 'card-inside-border': isInsideBorder }">
+      <div id="cardBack" class="card-container u-center" v-show="isBack">
+        <div class="card-back" :class="{ 'card-back-border': isBackBorder }">
           <img title="card image" :src="imageUrl" v-show="imageUrl" />
         </div>
       </div>
       <div class="control-container">
         <button type="button" @click="output">画像出力</button>
+        <div class="control-row">
+          <strong>表面</strong>
+        </div>
         <div class="control-row">
           <label for="id">ID</label>
           <input id="id" v-model="id" type="number" min="0" @keydown.enter="output" />
@@ -142,11 +145,15 @@
           <input type="file" @change="onUploadImage" placeholder="upload image." />
         </div>
         <div class="control-row">
-          <label>裏面</label>
-          <label for="isInside">裏面モード</label>
-          <input id="isInside" type="checkbox" v-model="isInside">
-          <label for="isInsideBorder">縁あり</label>
-          <input id="isInsideBorder" type="checkbox" v-model="isInsideBorder">
+          <strong>裏面</strong>
+        </div>
+        <div class="control-row">
+          <label for="isBack">裏面モード</label>
+          <input id="isBack" type="checkbox" v-model="isBack">
+        </div>
+        <div class="control-row">
+          <label for="isBackBorder">縁あり</label>
+          <input id="isBackBorder" type="checkbox" v-model="isBackBorder">
         </div>
       </div>
     </div>
@@ -179,8 +186,8 @@
           illustrator: "Bing Image Creator",
           mainColor: "#000000",
           uploadedImage: null,
-          isInside: false,
-          isInsideBorder: true,
+          isBack: false,
+          isBackBorder: true,
         };
       },
       computed: {
@@ -194,7 +201,7 @@
           if (!!this.uploadedImage) {
             return this.uploadedImage;
           }
-          if (this.isExistsId(this.id)) {
+          if (this.id === 0 || this.isExistsId(this.id)) {
             return `img/${this.formatedId}.jpg`
           }
           return null;
@@ -262,7 +269,7 @@
               link.click();
             })
             .catch(function (error) {
-              console.error('oops, something went wrong!', error);
+              console.error('error', error);
             });
         },
       },

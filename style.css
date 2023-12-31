@@ -85,7 +85,7 @@
   border-left: 2px solid #000;
   border-bottom: 2px solid #000;
   text-align: center;
-  padding-top: 0.4em;
+  padding-top: 0.3em;
 }
 
 .card-inner-top-division {
@@ -169,18 +169,18 @@
   flex: 1;
 }
 
-.card-inside {
+.card-back {
   width: 100%;
   height: 100%;
   overflow: hidden;
 }
 
-.card-inside-border {
+.card-back-border {
   width: calc(630px - var(--border-edge));
   height: calc(880px - var(--border-edge));
 }
 
-.card-inside > img {
+.card-back > img {
   width: 100%;
   height: 100%;
   object-fit: cover;
