@@ -260,7 +260,7 @@
           this.uploadedImage = null;
         },
         output() {
-          const node = document.getElementById('card');
+          const node = document.getElementById(this.isBack ? "cardBack" : "card");
           domtoimage.toPng(node, { width: 630, height: 880 })
             .then((dataUrl) => {
               var link = document.createElement('a');
