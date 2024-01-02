@@ -148,12 +148,32 @@
   padding: 0 0.4em 0.2em 0.4em;
 }
 
-.control-container {
+.control-wrapper {
   display: flex;
   flex-direction: column;
   gap: 0.4em;
   max-width: 630px;
   flex: 1;
+}
+
+.deck-container {
+  width: 630px;
+}
+
+.deck-table {
+  width: 100%;
+}
+.deck-table td {
+  text-align: center;
+}
+.deck-image {
+  width: 48px;
+}
+
+.control-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4em;
 }
 
 .control-row {
@@ -167,6 +187,23 @@
 .control-row > input,
 .control-row > textarea {
   flex: 1;
+}
+
+.file-wrapper {
+  flex: 1;
+  height: 3em;
+  border: 1px solid #000;
+  position: relative;
+}
+
+.file-wrapper > input[type="file"] {
+  position: absolute;
+  z-index: 1000;
+  opacity: 0;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
 }
 
 .card-back {

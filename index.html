@@ -12,14 +12,13 @@
   <link
     href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+JP:wght@400;500;700&family=Roboto+Condensed:wght@700&display=swap"
     rel="stylesheet" crossorigin="anonymous">
-  <script src="https://cdn.jsdelivr.net/npm/dom-to-image@2.6.0/dist/dom-to-image.min.js"></script>
   <link href="./style.css" rel="stylesheet">
 </head>
 
 <body>
   <div id="app" v-cloak>
     <div class="wrapper" v-if="cardSet !== null">
-      <div id="card" class="card-container u-center" v-show="!isBack">
+      <div id="card" class="card-container u-center" v-show="mode===0">
         <div class="card-inner">
           <div class="card-inner-top">
             <div class="card-inner-cost u-center" :style="{ 'background-color': mainColor }">
@@ -81,85 +80,168 @@
           </div>
         </div>
       </div>
-      <div id="cardBack" class="card-container u-center" v-show="isBack">
+      <div id="cardBack" class="card-container u-center" v-show="mode===1">
         <div class="card-back" :class="{ 'card-back-border': isBackBorder }">
           <img title="card image" :src="imageUrl" v-show="imageUrl" />
         </div>
       </div>
-      <div class="control-container">
-        <button type="button" @click="output">画像出力</button>
-        <div class="control-row">
-          <strong>表面</strong>
+      <div id="deck" class="deck-container" v-show="mode===2">
+        <table class="deck-table">
+          <thead>
+            <tr>
+              <th>削除</th>
+              <th>表裏</th>
+              <th>ID</th>
+              <th>名前</th>
+              <th>枚数</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="card in sortedDeck" :key="card.id">
+              <span v-if="card !== undefined">
+                <td>
+                  <button @click="removeCard(card.id)" type="button" tabindex="-1">削除</button>
+                </td>
+                <td>
+                  <img class="deck-image" title="image" :src="card.dataUrl" />
+                  <img class="deck-image" title="image" :src="backCard.dataUrl" v-if="!!backCard" />
+                </td>
+                <td>{{card.id}}</td>
+                <td>{{card.name}}</td>
+                <td>
+                  <input type="number" min="1" max="4" v-model="card.count" title="枚数"
+                    @change="if(!Number.isInteger(card) || card.count < 1) card.count = 1; if(card.count > 4) card.count = 4" />
+                  <button type="button" @click="card.count=card.count>1 ? card.count-1 : card.count">-1</button>
+                  <button type="button" @click="card.count=card.count<4 ? card.count+1 : card.count">+1</button>
+                </td>
+              </span>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="control-wrapper">
+        <div class="control-container">
+          <div class="control-row">
+            <strong>共通</strong>
+          </div>
+          <div class="control-row">
+            <label for="mode">モード</label>
+            <select id="mode" v-model.number="mode">
+              <option value="0">前面</option>
+              <option value="1">裏面</option>
+              <option value="2">デッキ</option>
+            </select>
+          </div>
+          <div class="control-row">
+            <label>カード画像</label>
+            <button type="button" @click="removeImage" :disabled="!uploadedImage">削除</button>
+            <div class="file-wrapper u-center">
+              <input type="file" @change=" onUploadImage" placeholder="upload image." :multiple="mode===2" />
+              <span>
+                カードファイルをアップロード
+              </span>
+            </div>
+          </div>
         </div>
-        <div class="control-row">
-          <label for="id">ID</label>
-          <input id="id" v-model="id" type="number" min="0" @keydown.enter="output" />
+        <div class="control-container" v-if="mode===0 || mode===1">
+          <div class="control-row">
+            <strong>表面・裏面</strong>
+          </div>
+          <div class="control-row">
+            <label for="name">出力</label>
+            <button type="button" @click="output">カード画像を出力</button>
+          </div>
+          <div class="control-row">
+            <label for="id">ID</label>
+            <input id="id" v-model="id" type="number" @keydown.enter="output" />
+            <button type="button" @click="id=id-1">-1</button>
+            <button type="button" @click="id=id+1">+1</button>
+          </div>
         </div>
-        <div class="control-row">
-          <label for="name">名前</label>
-          <input id="name" v-model="name" type="text" />
+        <div class="control-container" v-if="mode===0">
+          <div class="control-row">
+            <strong>表面</strong>
+          </div>
+          <div class="control-row">
+            <label for="name">名前</label>
+            <input id="name" v-model="name" type="text" />
+          </div>
+          <div class="control-row">
+            <label for="division">ディビジョン</label>
+            <input id="division" v-model="division" type="text" />
+          </div>
+          <div class="control-row">
+            <label for="mainColor">ディビジョン色</label>
+            <input id="mainColor" v-model="mainColor" type="text" />
+          </div>
+          <div class="control-row">
+            <label for="playCost">プレイコスト</label>
+            <input id="playCost" v-model="playCost" type="text" />
+          </div>
+          <div class="control-row">
+            <label for="resolveCost">リゾルブコスト</label>
+            <input id="resolveCost" v-model="resolveCost" type="text" />
+          </div>
+          <div class="control-row">
+            <label for="power">攻撃力</label>
+            <input id="power" v-model="power" type="text" />
+          </div>
+          <div class="control-row">
+            <label for="toughness">体力</label>
+            <input id="toughness" v-model="toughness" type="text" />
+          </div>
+          <div class="control-row">
+            <label for="meme">ミーム</label>
+            <input id="meme" v-model="meme" type="text" />
+          </div>
+          <div class="control-row">
+            <label for="effect">効果</label>
+            <textarea id="effect" v-model="effect" rows="4"></textarea>
+          </div>
+          <div class="control-row">
+            <label for="flavor">フレーバー</label>
+            <textarea id="flavor" v-model="flavor" rows="4"></textarea>
+          </div>
+          <div class="control-row">
+            <label for="illustrator">イラストレーター</label>
+            <input id="illustrator" v-model="illustrator" type="text" />
+          </div>
         </div>
-        <div class="control-row">
-          <label for="division">ディビジョン</label>
-          <input id="division" v-model="division" type="text" />
+        <div class="control-container" v-if="mode===1">
+          <div class="control-row">
+            <strong>裏面</strong>
+          </div>
+          <div class="control-row">
+            <label for="isBackBorder">縁あり</label>
+            <input id="isBackBorder" type="checkbox" v-model="isBackBorder">
+          </div>
         </div>
-        <div class="control-row">
-          <label for="mainColor">ディビジョン色</label>
-          <input id="mainColor" v-model="mainColor" type="text" />
-        </div>
-        <div class="control-row">
-          <label for="playCost">プレイコスト</label>
-          <input id="playCost" v-model="playCost" type="text" />
-        </div>
-        <div class="control-row">
-          <label for="resolveCost">リゾルブコスト</label>
-          <input id="resolveCost" v-model="resolveCost" type="text" />
-        </div>
-        <div class="control-row">
-          <label for="power">攻撃力</label>
-          <input id="power" v-model="power" type="text" />
-        </div>
-        <div class="control-row">
-          <label for="toughness">体力</label>
-          <input id="toughness" v-model="toughness" type="text" />
-        </div>
-        <div class="control-row">
-          <label for="meme">ミーム</label>
-          <input id="meme" v-model="meme" type="text" />
-        </div>
-        <div class="control-row">
-          <label for="effect">効果</label>
-          <textarea id="effect" v-model="effect" rows="4"></textarea>
-        </div>
-        <div class="control-row">
-          <label for="flavor">フレーバー</label>
-          <textarea id="flavor" v-model="flavor" rows="4"></textarea>
-        </div>
-        <div class="control-row">
-          <label for="illustrator">イラストレーター</label>
-          <input id="illustrator" v-model="illustrator" type="text" />
-        </div>
-        <div class="control-row">
-          <label>カード画像</label>
-          <button type="button" @click="removeImage" :disabled="!uploadedImage">削除</button>
-          <input type="file" @change="onUploadImage" placeholder="upload image." />
-        </div>
-        <div class="control-row">
-          <strong>裏面</strong>
-        </div>
-        <div class="control-row">
-          <label for="isBack">裏面モード</label>
-          <input id="isBack" type="checkbox" v-model="isBack">
-        </div>
-        <div class="control-row">
-          <label for="isBackBorder">縁あり</label>
-          <input id="isBackBorder" type="checkbox" v-model="isBackBorder">
+        <div class="control-container" v-if="mode===2">
+          <div class="control-row">
+            <strong>デッキ</strong>
+          </div>
+          <div class="control-row">
+            <label for="deckName">デッキ名</label>
+            <input id="deckName" v-model="deckName" type="text" />
+          </div>
+          <div class="control-row">
+            <label>デッキ枚数</label>
+            <div>{{deckCount}}</div>
+          </div>
+          <div class="control-row">
+            <label for="name">出力</label>
+            <button type="button" @click="dataOutput" :disabled="deckDisabled">ユドナリウム用のzipファイルを出力</button>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
   <script src="https://unpkg.com/vue@next"></script>
+  <script src="https://unpkg.com/dom-to-image@2.6.0"></script>
+  <script src="https://unpkg.com/crypto-js@4.2.0/crypto-js.js"></script>
+  <script src="https://unpkg.com/jszip@3.1.5/dist/jszip.min.js"></script>
+
   <script>
     const MAIN_COLOR_MAP = {
       "クリムゾンスレイヤー": "#CC0033",
@@ -167,12 +249,16 @@
       "フォレストソウル": "#288C66"
     }
 
-    const isHalfFontSize = (value) => String(value).length > 1;
+    const DECK_XML = `<?xml version="1.0" encoding="UTF-8"?><card-stack location.name="table" location.x="0" location.y="0" posZ="0" rotate="0" zindex="0" owner="" isShowTotal="true"><data name="card-stack"><data name="image"><data type="image" name="imageIdentifier"></data></data><data name="common"><data name="name">#DECK_NAME#</data></data><data name="detail"></data></data><node name="cardRoot">#DECK_CARD_LIST#</node></card-stack>`
+
+    const CARD_XML = `<card location.name="table" location.x="0" location.y="0" posZ="0" state="0" rotate="0" owner="" zindex="0"><data name="card"><data name="image"><data type="image" name="imageIdentifier"></data><data type="image" name="front">#CARD_FRONT#</data><data type="image" name="back">#CARD_BACK#</data></data><data name="common"><data name="name">#CARD_NAME#</data><data name="size">2</data></data><data name="detail"></data></data></card>`
 
     const App = {
       data() {
         return {
           cardSet: null,
+          mode: 0,
+          uploadedImage: null,
           id: 1,
           name: "",
           division: "",
@@ -185,9 +271,10 @@
           flavor: "",
           illustrator: "Bing Image Creator",
           mainColor: "#000000",
-          uploadedImage: null,
-          isBack: false,
           isBackBorder: true,
+          backCard: null,
+          deck: [],
+          deckName: "デッキ",
         };
       },
       computed: {
@@ -206,6 +293,16 @@
           }
           return null;
         },
+        deckCount() {
+          return this.deck.map(v => v.count).reduce((p, n) => p + n, 0);
+        },
+        sortedDeck() {
+          return this.deck.sort((a, b) => (a.id > b.id) ? 1 : -1);
+        },
+        deckDisabled() {
+          // return this.deckCount !== 30 || !this.backCard;
+          return false;
+        }
       },
       mounted() {
         this.cardSet = fetch('./data.json')
@@ -247,7 +344,51 @@
         },
         onUploadImage(e) {
           const files = e.target.files || e.dataTransfer.files;
-          this.createImage(files[0]);
+          if (this.mode === 2) {
+            this.createDeck(Array.from(files));
+          } else {
+            this.createImage(files[0]);
+          }
+        },
+        createDeck(files) {
+          files.forEach(file => {
+            const reader = new FileReader();
+            reader.onload = e => {
+              const dataUrl = e.target.result;
+              const datas = file.name.split("_");
+              const card = {
+                dataUrl,
+                rawFile: file,
+                id: datas[0],
+                name: datas[1],
+                hash: datas[2].replace(".png", ""),
+                count: 1,
+              }
+
+              if (card.id === "0000") {
+                if (this.backCard) {
+                  URL.revokeObjectURL(this.backCard.dataUrl)
+                }
+                this.backCard = card;
+                return;
+              }
+              const index = this.deck.findIndex(v => v.id === card.id);
+              if (index >= 0) {
+                // FIXME: $setが未定義だった…
+                this.deck[index] = card;
+                this.deck.splice();
+                return;
+              }
+              this.deck.push(card);
+            };
+            reader.readAsDataURL(file);
+          });
+        },
+        removeCard(id) {
+          const card = this.deck.find(v => v.id === id);
+          URL.revokeObjectURL(card.dataUrl)
+
+          this.deck = this.deck.filter(v => v.id !== id);
         },
         createImage(file) {
           const reader = new FileReader();
@@ -259,23 +400,89 @@
         removeImage() {
           this.uploadedImage = null;
         },
-        output() {
-          const node = document.getElementById(this.isBack ? "cardBack" : "card");
-          domtoimage.toPng(node, { width: 630, height: 880 })
-            .then((dataUrl) => {
-              var link = document.createElement('a');
-              link.download = `${this.formatedId}.png`;
-              link.href = dataUrl;
-              link.click();
-            })
-            .catch(function (error) {
-              console.error('error', error);
-            });
+        async output() {
+          const isFront = this.mode === 0;
+          const node = document.getElementById(isFront ? "card" : "cardBack");
+          const dataUrl = await domtoimage.toPng(node, { width: 630, height: 880 });
+
+          const blob = dataUrlToBlob(dataUrl);
+          const bufferReader = new FileReader();
+          bufferReader.onload = async (e) => {
+            const wordArray = CryptoJS.lib.WordArray.create(e.target.result);
+            const hash = CryptoJS.SHA256(wordArray).toString();
+
+            const formatedName = this.name.replaceAll("_", "");
+            const prefixName = isFront ? `${this.formatedId}_${formatedName}_` : `0000_裏面_`;
+            donwload(`${prefixName}${hash}.png`, dataUrl);
+          };
+          bufferReader.readAsArrayBuffer(blob);
         },
+        async dataOutput() {
+          const deckCardListXml = this.sortedDeck
+            .map(card => new Array(card.count).fill(card))
+            .flat()
+            .map(card => {
+              let xml = CARD_XML.replace("#CARD_FRONT#", card.hash);
+              xml = xml.replace("#CARD_BACK#", this.backCard.hash);
+              return xml.replace("#CARD_NAME#", card.name);
+            }).join("");
+
+          let xml = DECK_XML.replace("#DECK_NAME#", this.deckName);
+          xml = xml.replace("#DECK_CARD_LIST#", deckCardListXml);
+
+          const zip = new JSZip();
+          zip.file("data.xml", xml);
+          zip.file(this.backCard.rawFile.name, dataUrlToBlob(this.backCard.dataUrl));
+          this.sortedDeck.forEach(card => {
+            zip.file(card.rawFile.name, dataUrlToBlob(card.dataUrl));
+          })
+
+          zip.generateAsync({
+            type: "blob",
+            mimeType: "application/zip",
+            compression: "DEFLATE"
+          }).then((zipBlob) => {
+            donwload(`${this.deckName}_${getFormatedDate(new Date())}.zip`, URL.createObjectURL(zipBlob));
+          });
+        }
       },
     };
 
     Vue.createApp(App).mount("#app");
+
+    const donwload = (fileName, dataUrl) => {
+      const link = document.createElement('a');
+      link.download = `${fileName}`;
+      link.href = dataUrl;
+      link.click();
+    }
+
+    // https://scrapbox.io/takker/data_URI%E3%82%92Blob%E3%81%AB%E5%A4%89%E6%8F%9B%E3%81%99%E3%82%8B
+    const dataUrlToBlob = (dataUrl) => {
+      const byteString = atob(dataUrl.split(',')[1]);
+      const mimeType = dataUrl.match(/:([a-z\/\-]+);/)[1];
+
+      let buffer = new Uint8Array(byteString.length);
+      for (let i = 0; i < byteString.length; i++) {
+        buffer[i] = byteString.charCodeAt(i);
+      }
+      return new Blob([buffer], { type: mimeType });
+    }
+
+    const utf8Encoder = new TextEncoder("utf8");
+    function stringToByteArray(value) {
+      return utf8Encoder.encode(value);
+    }
+
+    const getFormatedDate = (date) => {
+      const yyyy = date.getFullYear();
+      const mm = String(date.getMonth() + 1).padStart(2, "0");
+      const dd = String(date.getDate()).padStart(2, "0");
+      const h = String(date.getHours()).padStart(2, "0");
+      const m = String(date.getMinutes()).padStart(2, "0");
+      const s = String(date.getSeconds()).padStart(2, "0");
+      return [yyyy, mm, dd, "_", h, m, s].join("");
+    }
   </script>
 </body>
 
