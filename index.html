@@ -127,7 +127,7 @@
           <div class="control-row">
             <label for="mode">モード</label>
             <select id="mode" v-model.number="mode">
-              <option value="0">前面</option>
+              <option value="0">表面</option>
               <option value="1">裏面</option>
               <option value="2">デッキ</option>
             </select>
@@ -300,8 +300,7 @@
           return this.deck.sort((a, b) => (a.id > b.id) ? 1 : -1);
         },
         deckDisabled() {
-          // return this.deckCount !== 30 || !this.backCard;
-          return false;
+          return this.deckCount !== 30 || !this.backCard;
         }
       },
       mounted() {
