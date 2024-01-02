@@ -110,9 +110,11 @@
                 <td>{{card.name}}</td>
                 <td>
                   <input type="number" min="1" max="4" v-model="card.count" title="枚数"
-                    @change="if(!Number.isInteger(card) || card.count < 1) card.count = 1; if(card.count > 4) card.count = 4" />
-                  <button type="button" @click="card.count=card.count>1 ? card.count-1 : card.count">-1</button>
-                  <button type="button" @click="card.count=card.count<4 ? card.count+1 : card.count">+1</button>
+                    @change="if(!Number.isInteger(card.count) || card.count < 1) card.count = 1; if(card.count > 4) card.count = 4" />
+                  <button type="button" @click="card.count=card.count>1 ? card.count-1 : card.count"
+                    tabindex="-1">-1</button>
+                  <button type="button" @click="card.count=card.count<4 ? card.count+1 : card.count"
+                    tabindex="-1">+1</button>
                 </td>
               </span>
             </tr>
@@ -154,8 +156,8 @@
           <div class="control-row">
             <label for="id">ID</label>
             <input id="id" v-model="id" type="number" @keydown.enter="output" />
-            <button type="button" @click="id=id-1">-1</button>
-            <button type="button" @click="id=id+1">+1</button>
+            <button type="button" @click="id=id-1" tabindex="-1">-1</button>
+            <button type="button" @click="id=id+1" tabindex="-1">+1</button>
           </div>
         </div>
         <div class="control-container" v-if="mode===0">
